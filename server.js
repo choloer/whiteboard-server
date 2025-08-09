@@ -7,14 +7,28 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
-    methods: ["GET", "POST"]
+    origin: [
+      process.env.CLIENT_URL,
+      "http://localhost:3000",
+      "https://client-miaytqf46-osama-projects.vercel.app",
+      /https:\/\/.*\.vercel\.app$/
+    ].filter(Boolean),
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+app.use(cors({
+  origin: [
+    process.env.CLIENT_URL,
+    "http://localhost:3000",
+    "https://client-miaytqf46-osama-projects.vercel.app",
+    /https:\/\/.*\.vercel\.app$/
+  ].filter(Boolean),
+  credentials: true
+}));
 app.use(express.json());
 
 // Store drawing data in memory (in production, use a database)
