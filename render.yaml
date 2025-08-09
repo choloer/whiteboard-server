@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: whiteboard-server
+    env: node
+    repo: https://github.com/choloer/whiteboard-server
+    buildCommand: npm install
+    startCommand: npm start
+    plan: free
+    region: oregon
+    branch: master
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        sync: false
+    domains:
+      - whiteboard-server.onrender.com
