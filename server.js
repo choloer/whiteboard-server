@@ -40,26 +40,40 @@ app.get('/', (req, res) => {
 
 // Socket.io connection handling
 io.on('connection', (socket) => {
-  console.log('User connected:', socket.id);
+  console.log(`[${new Date().toISOString()}] User connected:`, socket.id);
+  console.log(`Total clients: ${io.engine.clientsCount}`);
 
   // Send existing drawings to new user
+  console.log(`Sending ${drawings.length} existing drawings to ${socket.id}`);
   socket.emit('load-drawings', drawings);
 
   // Handle drawing events
   socket.on('drawing', (data) => {
+    console.log(`[${new Date().toISOString()}] Received drawing from ${socket.id}:`, {
+      x: data.x,
+      y: data.y,
+      color: data.color,
+      width: data.width
+    });
+    
     drawings.push(data);
+    
+    // Broadcast to all other clients
+    console.log(`Broadcasting drawing to ${io.engine.clientsCount - 1} other clients`);
     socket.broadcast.emit('drawing', data);
   });
 
   // Handle clear board
   socket.on('clear-board', () => {
+    console.log(`[${new Date().toISOString()}] Clear board requested by ${socket.id}`);
     drawings = [];
     socket.broadcast.emit('clear-board');
   });
 
   // Handle disconnect
-  socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
+  socket.on('disconnect', (reason) => {
+    console.log(`[${new Date().toISOString()}] User disconnected:`, socket.id, 'Reason:', reason);
+    console.log(`Remaining clients: ${io.engine.clientsCount}`);
   });
 });
 
